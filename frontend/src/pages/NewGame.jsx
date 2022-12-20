@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import {
  Button,
@@ -10,24 +12,70 @@ import {
  ToastMessage,
 } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
+import { START_NEW_GAME } from '../utilies';
 
 export default function NewGame() {
+ const navigate = useNavigate();
+ const authData = useSelector((state) => state.authReducer);
  const [modalState, updateModalState] = useState({
   message: null,
   visible: false,
+  color: '#6FCF97',
  });
 
- const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
   updateModalState(() => {
    return {
     message: 'Finding User',
     visible: true,
+    color: '#6FCF97',
    };
   });
-  alert('Hi');
-  console.log('Handle submit beign called');
-  console.log(e);
+  console.log(authData);
+  if (authData.userData.email === e.target[0].value) {
+   updateModalState({
+    visible: false,
+    color: '#6FCF97',
+    message: null,
+   });
+   return;
+  }
+  const userData = JSON.stringify({
+   player1: authData.userData.email,
+   player2: e.target[0].value,
+  });
+  const res = await fetch(START_NEW_GAME, {
+   method: 'POST',
+   body: userData,
+   headers: {
+    'Content-Type': 'application/json',
+   },
+  });
+
+  const data = await res.json();
+
+  if (data.status === 200) {
+   updateModalState({
+    message: 'New game created',
+    visible: true,
+    color: '#6FCF97',
+   });
+   navigate(`/play/${data.payload._id}`);
+  } else {
+   updateModalState({
+    message: 'User not found',
+    visible: true,
+    color: '#EB5757',
+   });
+   setTimeout(() => {
+    updateModalState({
+     message: null,
+     visible: false,
+     color: '#EB5757',
+    });
+   }, 5000);
+  }
  };
  return (
   <Wrapper>
@@ -42,7 +90,7 @@ export default function NewGame() {
      <Input placeholder='Type their email here' type='email' required />
     </FormField>
     {modalState.visible && (
-     <ToastMessage color='#6FCF97'>{modalState.message}</ToastMessage>
+     <ToastMessage color={modalState.color}>{modalState.message}</ToastMessage>
     )}
     <Button
      color={!modalState.visible ? '#F2C94C' : '#E0E0E0'}
