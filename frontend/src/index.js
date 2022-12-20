@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import './index.css';
 import 'semantic-ui-css/semantic.min.css';
+import store from './store/store';
 import Home from './pages/Home';
 import Play from './pages/Play';
 import Register from './pages/Register';
@@ -38,6 +40,8 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
  <React.StrictMode>
-  <RouterProvider router={router} />
+  <Provider store={store}>
+   <RouterProvider router={router} />
+  </Provider>
  </React.StrictMode>,
 );

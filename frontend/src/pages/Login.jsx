@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import {
  Button,
@@ -10,14 +12,19 @@ import {
  ToastMessage,
 } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
+import { LOGIN_URL } from '../utilies';
+import { login } from '../store/authSlice';
 
 export default function Login() {
+ const navigate = useNavigate();
+ const dispatch = useDispatch();
  const [modalState, updateModalState] = useState({
   message: null,
   visible: false,
+  color: '#6FCF97',
  });
 
- const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
   updateModalState(() => {
    return {
@@ -25,9 +32,61 @@ export default function Login() {
     visible: true,
    };
   });
-  alert('Hi');
-  console.log('Handle submit beign called');
-  console.log(e);
+  try {
+   const userData = JSON.stringify({
+    userName: e.target[0].value,
+    password: e.target[1].value,
+   });
+
+   const res = await fetch(LOGIN_URL, {
+    method: 'POST',
+    body: userData,
+    headers: {
+     'Content-Type': 'application/json',
+    },
+   });
+   const data = await res.json();
+
+   if (data.status === 200) {
+    dispatch(login(data.payload));
+    navigate('/dashboard', { replace: true });
+   } else {
+    updateModalState(() => {
+     return {
+      message: 'Invalid credentials',
+      visible: true,
+      color: '#EB5757',
+     };
+    });
+    setTimeout(() => {
+     updateModalState(() => {
+      return {
+       message: null,
+       visible: false,
+       color: null,
+      };
+     });
+    }, 5000);
+   }
+  } catch (error) {
+   console.log(error);
+   updateModalState(() => {
+    return {
+     message: 'OOPS!!! Some error ocurred',
+     visible: true,
+     color: '#EB5757',
+    };
+   });
+   setTimeout(() => {
+    updateModalState(() => {
+     return {
+      message: null,
+      visible: false,
+      color: null,
+     };
+    });
+   }, 5000);
+  }
  };
  return (
   <Wrapper>
@@ -47,7 +106,7 @@ export default function Login() {
      <Input placeholder='Type of password here' type='password' required />
     </FormField>
     {modalState.visible && (
-     <ToastMessage color='#6FCF97'>{modalState.message}</ToastMessage>
+     <ToastMessage color={modalState.color}>{modalState.message}</ToastMessage>
     )}
     <Button
      color={!modalState.visible ? '#F2C94C' : '#E0E0E0'}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 import {
  Button,
@@ -13,6 +14,7 @@ import Nav from '../components/Nav';
 import { REGISTRATION_URL } from '../utilies';
 
 export default function Register() {
+ const navigate = useNavigate();
  const [modalState, updateModalState] = useState({
   message: null,
   visible: false,
@@ -52,6 +54,9 @@ export default function Register() {
       color: '#6FCF97',
      };
     });
+    setTimeout(() => {
+     navigate('/login', { replace: true });
+    }, 2000);
    } else {
     updateModalState(() => {
      return {
