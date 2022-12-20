@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
+import { Button, Wrapper } from '../styles/styledCompnets';
 
 export default function Home() {
  return (
@@ -15,22 +18,15 @@ export default function Home() {
      toe
     </Heading>
    </div>
-   <Button color='#F2C94C'>Login</Button>
-   <Button color='#2F80ED'>Register</Button>
+   <div className='button-div' style={{ alignSelf: 'flex-end', width: '100%' }}>
+    <Button color='#F2C94C'>Login</Button>
+    <Button color='#2F80ED'>
+     <Link to={'/register'}>Register</Link>
+    </Button>
+   </div>
   </Wrapper>
  );
 }
-
-const Wrapper = styled.div`
- border: 2px solid black;
- border-radius: 2rem;
- margin: 2rem auto 2rem auto;
- display: flex;
- padding: 1rem;
- flex-direction: column;
- height: 90vh;
- aspect-ratio: 0.5;
-`;
 
 const Heading = styled.h3`
  font-family: 'Bilbo';
@@ -39,20 +35,4 @@ const Heading = styled.h3`
  line-height: ${(props) => props.lh};
  letter-spacing: 0em;
  text-align: center;
-`;
-
-const Button = styled.div`
- width: 90%;
- margin: 1rem auto;
- font-size: 1.4rem;
- line-height: 1.4rem;
- text-align: center;
- color: white;
- height: 5.6rem;
- border-radius: 0.5rem;
- display: flex;
- align-items: center;
- justify-content: center;
- cursor: pointer;
- background-color: ${(props) => props.color};
 `;

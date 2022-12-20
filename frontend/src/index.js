@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Play from './pages/Play';
 import Auth from './pages/Auth';
 import 'semantic-ui-css/semantic.min.css';
+import Register from './pages/Register';
 
 const router = createBrowserRouter([
  {
@@ -17,8 +18,8 @@ const router = createBrowserRouter([
   element: <Play />,
  },
  {
-  path: '/auth',
-  element: <Auth />,
+  path: '/register',
+  element: <Register />,
  },
 ]);
 
