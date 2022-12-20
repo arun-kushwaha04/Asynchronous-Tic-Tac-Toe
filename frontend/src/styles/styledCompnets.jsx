@@ -11,6 +11,9 @@ export const Wrapper = styled.div`
  height: 90vh;
  aspect-ratio: 0.5;
  overflow-y: auto;
+ ::-webkit-scrollbar {
+  display: none;
+ }
 `;
 
 export const Button = styled.button`
@@ -20,11 +23,14 @@ export const Button = styled.button`
  line-height: 1.2rem;
  text-align: center;
  color: white;
- min-height: 3rem;
+ min-height: 3.5rem;
  border-radius: 0.5rem;
  display: flex;
  align-items: center;
  justify-content: center;
+ font-family: 'Epilogue';
+ font-style: normal;
+ font-weight: 700;
  cursor: pointer;
  box-shadow: 2px 2px 16px rgba(0, 0, 0, 0.16);
  background-color: ${(props) => props.color};
@@ -79,7 +85,7 @@ export const ToastMessage = styled.div`
  line-height: 1.2rem;
  text-align: center;
  color: white;
- min-height: 3.5rem;
+ min-height: 4rem;
  border-radius: 0.5rem;
  display: flex;
  align-items: center;

@@ -69,8 +69,8 @@ const Header = styled.header`
   font-family: 'Epilogue';
   font-style: normal;
   font-weight: 700;
-  font-size: 1.4rem;
-  line-height: 1.4rem;
+  font-size: 1.2rem;
+  line-height: 1.5rem;
   color: #333333;
  }
 
@@ -78,8 +78,8 @@ const Header = styled.header`
   font-family: 'Epilogue';
   font-style: normal;
   font-weight: 700;
-  font-size: 2.8rem;
-  line-height: 3.2rem;
+  font-size: 2rem;
+  line-height: 2.5rem;
   letter-spacing: -0.05em;
   color: #333333;
  }

@@ -18,13 +18,13 @@ export default function Home() {
      toe
     </Heading>
    </div>
-   <div className='button-div' style={{ alignSelf: 'flex-end', width: '100%' }}>
-    <Button color='#F2C94C'>
-     <Link to={'/login'}>Login</Link>
-    </Button>
-    <Button color='#2F80ED'>
-     <Link to={'/register'}>Register</Link>
-    </Button>
+   <div className='button-div' style={{ marginTop: 'auto' }}>
+    <Link to={'/login'}>
+     <Button color='#F2C94C'>Login</Button>
+    </Link>
+    <Link to={'/register'}>
+     <Button color='#2F80ED'>Register</Button>
+    </Link>
    </div>
   </Wrapper>
  );
