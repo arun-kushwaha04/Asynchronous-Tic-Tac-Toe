@@ -4,9 +4,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
 import Home from './pages/Home';
 import Play from './pages/Play';
-import Auth from './pages/Auth';
 import 'semantic-ui-css/semantic.min.css';
 import Register from './pages/Register';
+import Login from './pages/Login.jsx';
 
 const router = createBrowserRouter([
  {
@@ -20,6 +20,10 @@ const router = createBrowserRouter([
  {
   path: '/register',
   element: <Register />,
+ },
+ {
+  path: '/login',
+  element: <Login />,
  },
 ]);
 

@@ -20,7 +20,7 @@ export const Button = styled.button`
  line-height: 1.2rem;
  text-align: center;
  color: white;
- min-height: 2.6rem;
+ min-height: 3rem;
  border-radius: 0.5rem;
  display: flex;
  align-items: center;
@@ -79,7 +79,7 @@ export const ToastMessage = styled.div`
  line-height: 1.2rem;
  text-align: center;
  color: white;
- min-height: 3rem;
+ min-height: 3.5rem;
  border-radius: 0.5rem;
  display: flex;
  align-items: center;

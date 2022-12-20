@@ -19,7 +19,9 @@ export default function Home() {
     </Heading>
    </div>
    <div className='button-div' style={{ alignSelf: 'flex-end', width: '100%' }}>
-    <Button color='#F2C94C'>Login</Button>
+    <Button color='#F2C94C'>
+     <Link to={'/login'}>Login</Link>
+    </Button>
     <Button color='#2F80ED'>
      <Link to={'/register'}>Register</Link>
     </Button>
