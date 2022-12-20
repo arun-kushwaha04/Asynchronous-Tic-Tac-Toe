@@ -10,24 +10,86 @@ import {
  ToastMessage,
 } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
+import { REGISTRATION_URL } from '../utilies';
 
 export default function Register() {
  const [modalState, updateModalState] = useState({
   message: null,
   visible: false,
+  color: '#6FCF97',
  });
 
- const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
-  updateModalState(() => {
-   return {
-    message: 'Registering ....',
-    visible: true,
-   };
-  });
-  alert('Hi');
-  console.log('Handle submit beign called');
-  console.log(e);
+  try {
+   updateModalState(() => {
+    return {
+     message: 'Registering ....',
+     visible: true,
+     color: '#6FCF97',
+    };
+   });
+   const userData = JSON.stringify({
+    name: e.target[0].value,
+    userName: e.target[1].value,
+    email: e.target[2].value,
+    password: e.target[3].value,
+   });
+   const res = await fetch(REGISTRATION_URL, {
+    method: 'POST',
+    body: userData,
+    headers: {
+     'Content-Type': 'application/json',
+    },
+   });
+   const data = await res.json();
+
+   if (data.status === 200) {
+    updateModalState(() => {
+     return {
+      message: 'Congratulations!!! Account created.',
+      visible: true,
+      color: '#6FCF97',
+     };
+    });
+   } else {
+    updateModalState(() => {
+     return {
+      message: data.message,
+      visible: true,
+      color: '#EB5757',
+     };
+    });
+    setTimeout(() => {
+     updateModalState(() => {
+      return {
+       message: null,
+       visible: false,
+       color: null,
+      };
+     });
+    }, 5000);
+   }
+  } catch (error) {
+   console.log(error);
+   updateModalState(() => {
+    return {
+     message: 'OOPS!!! Some error ocurred',
+     visible: true,
+     color: '#EB5757',
+    };
+   });
+   setTimeout(() => {
+    updateModalState(() => {
+     return {
+      message: null,
+      visible: false,
+      color: null,
+     };
+    });
+   }, 5000);
+  }
+  return;
  };
  return (
   <Wrapper>
@@ -54,7 +116,7 @@ export default function Register() {
      <Input placeholder='Type of password here' type='password' required />
     </FormField>
     {modalState.visible && (
-     <ToastMessage color='#6FCF97'>{modalState.message}</ToastMessage>
+     <ToastMessage color={modalState.color}>{modalState.message}</ToastMessage>
     )}
     <Button
      color={!modalState.visible ? '#F2C94C' : '#E0E0E0'}
