@@ -36,6 +36,9 @@ const game = mongoose.Schema({
   type: 'number',
   default: null,
  },
+ userName: {
+  type: 'string',
+ },
 });
 
 module.exports = mongoose.model('Game', game);

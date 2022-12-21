@@ -1,14 +1,27 @@
 const Game = require('../models/games');
+const User = require('../models/users');
 
 exports.getAllGames = async (req, res) => {
  try {
   const { email } = req.body;
-  const game1List = await Game.find({ palyer1: email });
-  const game2List = await Game.find({ palyer2: email });
+  const userEmail = [];
+  const game1List = await Game.find({ player1: email });
+  const game2List = await Game.find({ player2: email });
   let games = [...game1List, ...game2List];
 
   games = games.sort((a, b) => a.lastModified > b.lastModified);
-  console.log(games);
+
+  games.forEach((game) => {
+   if (game.player1 != email) userEmail.push(game.player1);
+   else userEmail.push(game.player2);
+  });
+
+  const data = await User.find({ email: { $in: userEmail } });
+
+  data.forEach(({ userName }, index) => {
+   games[index]['userName'] = userName;
+  });
+
   res.status(200).json({
    message: 'User games reterieved',
    payload: games,
@@ -27,6 +40,14 @@ exports.getAllGames = async (req, res) => {
 exports.startNewGame = async (req, res) => {
  try {
   const { player1, player2 } = req.body;
+  const user = await User.findOne({ email: player2 });
+  if (!user) {
+   res.status(400).json({
+    message: 'Incorrect user mail id',
+    payload: null,
+    status: 400,
+   });
+  }
   const dateString = String(new Date(Date()).getTime());
   const game = new Game({
    player1: player1,
