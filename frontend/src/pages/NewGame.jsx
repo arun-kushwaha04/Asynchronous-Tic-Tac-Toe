@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -12,10 +12,12 @@ import {
  ToastMessage,
 } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
-import { START_NEW_GAME } from '../utilies';
+import { START_NEW_GAME } from '../utils/utilies';
+import { addGameData } from '../store/gameSlice';
 
 export default function NewGame() {
  const navigate = useNavigate();
+ const dispatch = useDispatch();
  const authData = useSelector((state) => state.authReducer);
  const [modalState, updateModalState] = useState({
   message: null,
@@ -61,6 +63,7 @@ export default function NewGame() {
     visible: true,
     color: '#6FCF97',
    });
+   dispatch(addGameData(data.payload));
    navigate(`/play/${data.payload._id}`);
   } else {
    updateModalState({

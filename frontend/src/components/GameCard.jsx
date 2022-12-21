@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 import { Button } from '../styles/styledCompnets';
+import { useDispatch } from 'react-redux';
+import { addGameData } from '../store/gameSlice';
 
 export default function GameCard({ game, userEmail }) {
- console.log(game, userEmail);
+ const dispatch = useDispatch();
+
  const dateString = (ftime) => {
   const millisTime = parseInt(ftime);
   let dateString = new Date(millisTime).toDateString();
@@ -17,10 +20,31 @@ export default function GameCard({ game, userEmail }) {
   dateString += ' ' + time + ' ' + hourNotation;
   return dateString;
  };
+ const otherUserEmail =
+  game.player1 === userEmail ? game.player2 : game.player1;
+
+ const clickHandler = (data) => {
+  dispatch(addGameData(data));
+ };
+
  return (
   <GameDiv>
    <h3>Game with {game.userName}</h3>
-   {game.nextMoveBy === userEmail ? (
+   {game.gameFinished === true ? (
+    game.gameWonBy === userEmail ? (
+     <div>
+      <h5>You Won!!</h5>
+     </div>
+    ) : game.gameWonBy === otherUserEmail ? (
+     <div>
+      <h5>You Lost</h5>
+     </div>
+    ) : (
+     <div>
+      <h5>It's a draw</h5>
+     </div>
+    )
+   ) : game.nextMoveBy === userEmail ? (
     <div>
      <h5>
       {game.userName} just made their move! <br /> It's your turn to play now.
@@ -33,10 +57,15 @@ export default function GameCard({ game, userEmail }) {
      </h5>
     </div>
    )}
+
    <p>{dateString(game.lastModified)}</p>
-   <Link to={`/play/${game._id}`}>
+   <Link to={`/play/${game._id}`} onClick={() => clickHandler(game)}>
     <Button color='#F2C94C'>
-     {game.nextMoveBy === userEmail ? 'Play!' : 'View Game'}
+     {game.gameFinished === true
+      ? 'View Game'
+      : game.nextMoveBy === userEmail
+      ? 'Play!'
+      : 'View Game'}
     </Button>
    </Link>
   </GameDiv>

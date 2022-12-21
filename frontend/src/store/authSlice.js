@@ -10,7 +10,8 @@ const authSlice = createSlice({
  name: 'auth',
  initialState: {
   userToken: localStorage.getItem('userToken') || null,
-  isAuthenticated: false,
+  isAuthenticated:
+   localStorage.getItem('userToken') && localStorage.getItem('user-data'),
   userData: JSON.parse(localStorage.getItem('user-data')) || null,
  },
  reducers: {

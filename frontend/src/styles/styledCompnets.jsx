@@ -11,6 +11,7 @@ export const Wrapper = styled.div`
  height: 90vh;
  aspect-ratio: 0.5;
  overflow-y: auto;
+ position: relative;
  ::-webkit-scrollbar {
   display: none;
  }

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import {
  Button,
@@ -12,8 +14,18 @@ import {
 import Nav from '../components/Nav';
 import xPiece from '../xPiece.svg';
 import oPiece from '../oPiece.svg';
+import { addGameData } from '../store/gameSlice';
+import { UPDATE_GAME_STATUS } from '../utils/utilies';
 
 export default function Play() {
+ const navigate = useNavigate();
+ const gameData = useSelector((state) => state.gameReducer);
+ const userEmail = useSelector((state) => state.authReducer).userData.email;
+ const userNumber = gameData.player1 === userEmail ? 1 : 2;
+ const otherUserEmail =
+  gameData.player1 === userEmail ? gameData.player2 : gameData.player1;
+
+ const dispatch = useDispatch();
  const [modalState, updateModalState] = useState({
   message: null,
   visible: false,
@@ -30,25 +42,110 @@ export default function Play() {
   block8: 2,
   block9: 0,
  });
- const userNumber = 1;
- const handleSubmit = (e) => {
+
+ useEffect(() => {
+  updateGameState(gameData.gameState);
+ }, [gameData.gameState]);
+
+ const [currentMoveState, updateCurrentMoveState] = useState({
+  isMoveMade: false,
+  moveMadeAt: null,
+ });
+
+ const handleSubmit = async (e) => {
   e.preventDefault();
   updateModalState(() => {
    return {
     message: 'Submitting....',
-    visible: true,
+    visible: false,
+    color: '#6FCF97',
    };
   });
 
-  console.log('Handle submit beign called');
-  console.log(e);
+  try {
+   const updatedGame = checkForWin(
+    gameState,
+    userNumber,
+    userEmail,
+    otherUserEmail,
+   );
+   let newGameData = { ...gameData };
+   newGameData.gameState = gameState;
+   newGameData.gameFinished = updatedGame.gameFinished;
+   newGameData.gameWonBy = updatedGame.gameWonBy;
+   newGameData.nextMoveBy = otherUserEmail;
+   await dispatch(addGameData(newGameData));
+   const userData = JSON.stringify({
+    gameId: gameData._id,
+    gameFinished: newGameData.gameFinished,
+    nextMoveBy: newGameData.nextMoveBy,
+    gameState: newGameData.gameState,
+    gameWonBy: newGameData.gameWonBy,
+   });
+   const res = await fetch(UPDATE_GAME_STATUS, {
+    method: 'POST',
+    body: userData,
+    headers: {
+     'Content-Type': 'application/json',
+    },
+   });
+
+   const data = res.json();
+
+   if (data.status === 200) {
+    navigate(0);
+   } else {
+    updateModalState(() => {
+     return {
+      message: 'Error saving game state',
+      visible: true,
+      color: '#EB5757',
+     };
+    });
+
+    setTimeout(() => {
+     navigate(-1);
+    }, 2000);
+   }
+  } catch (error) {
+   console.log(error);
+   updateModalState(() => {
+    return {
+     message: 'Error saving game state',
+     visible: true,
+     color: '#EB5757',
+    };
+   });
+
+   setTimeout(() => {
+    navigate(-1);
+   }, 2000);
+  }
  };
  const userClickHandler = (blockId) => {
-  if (gameState[blockId] === 0) {
+  if (gameData.gameFinished) return;
+  if (
+   gameData.nextMoveBy === userEmail &&
+   gameState[blockId] === 0 &&
+   currentMoveState.isMoveMade === false
+  ) {
    updateGameState((oldState) => {
     return { ...oldState, [blockId]: userNumber };
    });
+   updateCurrentMoveState({
+    isMoveMade: true,
+    moveMadeAt: blockId,
+   });
   } else {
+   if (currentMoveState.moveMadeAt === blockId) {
+    updateGameState((oldState) => {
+     return { ...oldState, [blockId]: 0 };
+    });
+    updateCurrentMoveState({
+     isMoveMade: false,
+     moveMadeAt: null,
+    });
+   }
    return;
   }
  };
@@ -71,11 +168,24 @@ export default function Play() {
   <Wrapper>
    <Nav />
    <Header>
-    <h2>Game With Tanmay</h2>
+    <h2>Game With {gameData.userName}</h2>
     <h4>Your Piece</h4>
     <img src={xPiece} alt="User's Piece" />
    </Header>
-   <HeaderDiv>Your Move</HeaderDiv>
+   {gameData.gameFinished === true ? (
+    <HeaderDiv>
+     {gameData.gameWonBy === userEmail
+      ? 'You won'
+      : gameData.gameWonBy === otherUserEmail
+      ? 'You lost'
+      : "It's a draw"}
+    </HeaderDiv>
+   ) : (
+    <HeaderDiv>
+     {gameData.nextMoveBy === userEmail ? 'Your' : 'Their'} Move
+    </HeaderDiv>
+   )}
+
    <GameBox>
     <div className='block1 top left' onClick={() => userClickHandler('block1')}>
      {renderElement(gameState.block1)}
@@ -116,18 +226,167 @@ export default function Play() {
    </GameBox>
 
    {modalState.visible && (
-    <ToastMessage color='#6FCF97'>{modalState.message}</ToastMessage>
+    <ToastMessage color={modalState.color}>{modalState.message}</ToastMessage>
    )}
    <Button
-    color={!modalState.visible ? '#F2C94C' : '#E0E0E0'}
-    disabled={modalState.visible}
+    color={
+     !(
+      !currentMoveState.isMoveMade ||
+      gameData.nextMoveBy === otherUserEmail ||
+      modalState.visible
+     )
+      ? '#F2C94C'
+      : '#E0E0E0'
+    }
     style={{ marginTop: 'auto' }}
+    disabled={
+     !currentMoveState.isMoveMade ||
+     gameData.nextMoveBy === otherUserEmail ||
+     modalState.visible
+    }
+    onClick={handleSubmit}
    >
-    Submit!
+    {gameData.nextMoveBy === otherUserEmail
+     ? `Waiting for ${gameData.userName}`
+     : 'Submit!'}
    </Button>
   </Wrapper>
  );
 }
+const checkForWin = (
+ { block1, block2, block3, block4, block5, block6, block7, block8, block9 },
+ userNumber,
+ userEmail,
+ otherUserEmail,
+) => {
+ //checking for verticlal line
+ if (block1 === block2 && block1 === block3 && block1 !== 0) {
+  if (userNumber === block1) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ if (block4 === block5 && block4 === block6 && block4 !== 0) {
+  if (userNumber === block4) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ if (block7 === block8 && block7 === block9 && block7 !== 0) {
+  if (userNumber === block7) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ //checking for horizontal line
+ if (block1 === block4 && block1 === block7 && block1 !== 0) {
+  if (userNumber === block1) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ if (block2 === block5 && block2 === block8 && block2 !== 0) {
+  if (userNumber === block2) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ if (block3 === block6 && block3 === block9 && block3 !== 0) {
+  if (userNumber === block3) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ //checking for diagnols
+ if (block1 === block5 && block1 === block9 && block1 !== 0) {
+  if (userNumber === block1) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ if (block3 === block5 && block3 === block7 && block3 !== 0) {
+  if (userNumber === block3) {
+   return {
+    gameFinished: true,
+    gameWonBy: userEmail,
+   };
+  } else {
+   return {
+    gameFinished: true,
+    gameWonBy: otherUserEmail,
+   };
+  }
+ }
+ if (
+  block1 !== 0 &&
+  block2 !== 0 &&
+  block3 !== 0 &&
+  block4 !== 0 &&
+  block5 !== 0 &&
+  block6 !== 0 &&
+  block7 !== 0 &&
+  block8 !== 0 &&
+  block9 !== 0
+ ) {
+  return {
+   gameFinished: true,
+   gameWonBy: null,
+  };
+ }
+ return {
+  gameFinished: false,
+  gameWonBy: null,
+ };
+};
 
 const Header = styled.header`
  width: 100%;
