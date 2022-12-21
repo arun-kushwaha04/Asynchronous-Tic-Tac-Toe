@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "cd ../frontend && yarn run build && (cd ../backend && node index.js)",
+        "start": "cd ../frontend && yarn install && yarn run build && (cd ../backend && node index.js)",
         "dev": "nodemon index.js"
     },
     "keywords": [],
