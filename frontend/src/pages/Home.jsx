@@ -17,7 +17,7 @@ export default function Home() {
    }
   };
   checkUserToken();
- }, []);
+ }, [navigate]);
  return (
   <Wrapper>
    <div className='heading-div' style={{ padding: '10rem 0 2rem 0' }}>

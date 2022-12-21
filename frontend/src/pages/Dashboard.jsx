@@ -20,6 +20,7 @@ export default function Dashboard() {
     body: userData,
     headers: {
      'Content-Type': 'application/json',
+     Authorization: `${localStorage.getItem('userToken')}`,
     },
    });
    const data = await res.json();

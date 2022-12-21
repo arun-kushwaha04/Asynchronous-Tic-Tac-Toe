@@ -80,6 +80,7 @@ export default function Play() {
     body: userData,
     headers: {
      'Content-Type': 'application/json',
+     Authorization: `${localStorage.getItem('userToken')}`,
     },
    });
 

@@ -52,6 +52,7 @@ export default function NewGame() {
    body: userData,
    headers: {
     'Content-Type': 'application/json',
+    Authorization: `${localStorage.getItem('userToken')}`,
    },
   });
 
