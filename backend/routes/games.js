@@ -5,9 +5,10 @@ const {
  startNewGame,
  updateGameStatus,
 } = require('../controllers/game');
+const { verifyToken } = require('../middleware/tokenVerifier');
 
-router.post('/getAllGame', getAllGames);
-router.post('/startNewGame', startNewGame);
-router.post('/updateGame', updateGameStatus);
+router.post('/getAllGame', verifyToken, getAllGames);
+router.post('/startNewGame', verifyToken, startNewGame);
+router.post('/updateGame', verifyToken, updateGameStatus);
 
 module.exports = router;
