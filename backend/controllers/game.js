@@ -124,7 +124,6 @@ exports.updateGameStatus = async (req, res) => {
     game.gameState = gameState;
     game.gameWonBy = gameWonBy;
     game.lastModified = dateString;
-    console.log(game);
     await game.save();
    }
   });
