@@ -33,7 +33,7 @@ const game = mongoose.Schema({
   require: true,
  },
  gameWonBy: {
-  type: 'number',
+  type: 'string',
   default: null,
  },
  userName: {

@@ -9,7 +9,10 @@ exports.getAllGames = async (req, res) => {
   const game2List = await Game.find({ player2: email });
   let games = [...game1List, ...game2List];
 
-  games = games.sort((a, b) => a.lastModified > b.lastModified);
+  games = games.sort((a, b) => {
+   if (a.lastModified <= b.lastModified) return 1;
+   return -1;
+  });
 
   games.forEach((game) => {
    if (game.player1 != email) userEmail.push(game.player1);
@@ -18,8 +21,19 @@ exports.getAllGames = async (req, res) => {
 
   const data = await User.find({ email: { $in: userEmail } });
 
-  data.forEach(({ userName }, index) => {
-   games[index]['userName'] = userName;
+  games.forEach((gameData, index) => {
+   let userName;
+   for (let i = 0; i < data.length; i++) {
+    let x = data[i];
+    if (
+     (x.email != email && x.email === gameData.player2) ||
+     x.email === gameData.player1
+    ) {
+     userName = x.userName;
+     break;
+    }
+   }
+   gameData['userName'] = userName;
   });
 
   res.status(200).json({
@@ -86,11 +100,12 @@ exports.startNewGame = async (req, res) => {
 
 exports.updateGameStatus = async (req, res) => {
  try {
-  const { gameId, gameFinised, nextMoveBy, gameState, gameWonBy } = req.body;
+  const { gameId, gameFinished, nextMoveBy, gameState, gameWonBy } = req.body;
   const dateString = String(new Date(Date()).getTime());
 
   Game.findById(gameId, async (err, game) => {
    if (err) {
+    console.log(err);
     res.status(500).json({
      message: 'Internal error occured',
      payload: null,
@@ -104,12 +119,12 @@ exports.updateGameStatus = async (req, res) => {
      status: 400,
     });
    } else {
-    game.gameFinised = gameFinised;
+    game.gameFinished = gameFinished;
     game.nextMoveBy = nextMoveBy;
     game.gameState = gameState;
     game.gameWonBy = gameWonBy;
     game.lastModified = dateString;
-
+    console.log(game);
     await game.save();
    }
   });
