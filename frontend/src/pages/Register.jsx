@@ -11,7 +11,7 @@ import {
  ToastMessage,
 } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
-import { REGISTRATION_URL } from '../utilies';
+import { REGISTRATION_URL } from '../utils/utilies';
 
 export default function Register() {
  const navigate = useNavigate();

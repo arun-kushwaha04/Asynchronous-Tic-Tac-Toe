@@ -12,15 +12,12 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import NewGame from './pages/NewGame';
+import ProtectRoute from './utils/ProtectRoute';
 
 const router = createBrowserRouter([
  {
   path: '/',
   element: <Home />,
- },
- {
-  path: '/play/:gameId',
-  element: <Play />,
  },
  {
   path: '/register',
@@ -32,9 +29,16 @@ const router = createBrowserRouter([
  },
  {
   path: '/dashboard',
-  element: <Dashboard />,
+  element: <ProtectRoute componentToPass={<Dashboard />} />,
  },
- { path: '/newGame', element: <NewGame /> },
+ {
+  path: '/newGame',
+  element: <ProtectRoute componentToPass={<NewGame />} />,
+ },
+ {
+  path: '/play/:gameId',
+  element: <ProtectRoute componentToPass={<Play />} />,
+ },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

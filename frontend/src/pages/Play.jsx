@@ -3,14 +3,7 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import {
- Button,
- Wrapper,
- Label,
- Input,
- FormField,
- ToastMessage,
-} from '../styles/styledCompnets';
+import { Button, Wrapper, ToastMessage } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
 import xPiece from '../xPiece.svg';
 import oPiece from '../oPiece.svg';

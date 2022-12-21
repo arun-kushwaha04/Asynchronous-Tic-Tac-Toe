@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, Wrapper } from '../styles/styledCompnets';
 
 export default function Home() {
+ const navigate = useNavigate();
+ useEffect(() => {
+  const checkUserToken = () => {
+   const userToken = localStorage.getItem('userToken');
+   if (!userToken || userToken === 'undefined') {
+    return;
+   } else {
+    navigate('/dashboard');
+   }
+  };
+  checkUserToken();
+ }, []);
  return (
   <Wrapper>
    <div className='heading-div' style={{ padding: '10rem 0 2rem 0' }}>

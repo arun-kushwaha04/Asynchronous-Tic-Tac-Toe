@@ -12,7 +12,7 @@ import {
  ToastMessage,
 } from '../styles/styledCompnets';
 import Nav from '../components/Nav';
-import { LOGIN_URL } from '../utilies';
+import { LOGIN_URL } from '../utils/utilies';
 import { login } from '../store/authSlice';
 
 export default function Login() {
