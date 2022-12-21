@@ -54,6 +54,24 @@ exports.getAllGames = async (req, res) => {
 exports.startNewGame = async (req, res) => {
  try {
   const { player1, player2 } = req.body;
+  const game1 = await Game.findOne({
+   player1: player1,
+   player2: player2,
+   gameFinished: false,
+  });
+  const game2 = await Game.findOne({
+   player1: player2,
+   player2: player1,
+   gameFinished: false,
+  });
+  if (game1 || game2) {
+   res.status(400).json({
+    message: 'A game already exists',
+    payload: null,
+    status: 400,
+   });
+   return;
+  }
   const user = await User.findOne({ email: player2 });
   if (!user) {
    res.status(400).json({
@@ -66,7 +84,7 @@ exports.startNewGame = async (req, res) => {
   const game = new Game({
    player1: player1,
    player2: player2,
-   gameFinised: false,
+   gameFinished: false,
    nextMoveBy: player1,
    gameState: {
     block1: 0,

@@ -68,7 +68,8 @@ export default function NewGame() {
    navigate(`/play/${data.payload._id}`);
   } else {
    updateModalState({
-    message: 'User not found',
+    message:
+     "Bad request - possible user doesn't exists or a game already is open with this user",
     visible: true,
     color: '#EB5757',
    });
